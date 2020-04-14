@@ -38,7 +38,11 @@ class Dataset(object):
 
     def addItemIndices(self, itemMap):
         data = pd.merge(self.data, itemMap, on=self.itemKey, how='inner')
-        return data;
+        sessionLen = data.groupby(self.sessionKey).size()
+        data = data[np.in1d(data[self.sessionKey], sessionLen[sessionLen > 1].index)]
+        if(len(data) == 0):
+            raise ValueError("Data Cannot Be Empty") 
+        return data
 
     def createItemMap(self):
         itemIds = self.data[self.itemKey].unique()
